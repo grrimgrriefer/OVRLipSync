@@ -1,0 +1,4 @@
+*.pb filter=lfs diff=lfs merge=lfs -text
+*.so filter=lfs diff=lfs merge=lfs -text
+ThirdParty/Lib/Mac/libOVRLipSync.dylib filter=lfs diff=lfs merge=lfs -text
+ThirdParty/Lib/Win64/OVRLipSync.dll filter=lfs diff=lfs merge=lfs -text

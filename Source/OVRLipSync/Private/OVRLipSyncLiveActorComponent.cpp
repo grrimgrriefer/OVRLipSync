@@ -23,10 +23,9 @@
 
 #include "OVRLipSyncLiveActorComponent.h"
 
-#include "AndroidPermissionCallbackProxy.h"
-#include "AndroidPermissionFunctionLibrary.h"
 #include "OVRLipSyncContextWrapper.h"
-#include "Voice/Public/VoiceModule.h"
+#include "OVRLipSyncModule.h"
+#include "Voice.h"
 
 #include <Core.h>
 #include <algorithm>
@@ -57,11 +56,13 @@ void UOVRLipSyncActorComponent::BeginPlay()
 
 	LipSyncContext = MakeShared<UOVRLipSyncContextWrapper>(ContextProviderFromProviderKind(ProviderKind), SampleRate,
 														   BufferSize, FString(), EnableHardwareAcceleration);
-	LipSyncContext->SetAsyncCallback([this](const TArray<float> &NewVisemes, float NewLaughterScore) {
-		Visemes = NewVisemes;
-		LaughterScore = NewLaughterScore;
-		OnVisemesReady.Broadcast();
-	});
+	LipSyncContext->SetAsyncCallback(
+		[this](const TArray<float> &NewVisemes, float NewLaughterScore)
+		{
+			Visemes = NewVisemes;
+			LaughterScore = NewLaughterScore;
+			OnVisemesReady.Broadcast();
+		});
 }
 
 void UOVRLipSyncActorComponent::EndPlay(const EEndPlayReason::Type EndPlayReason)

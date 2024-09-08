@@ -23,7 +23,7 @@
 
 #pragma once
 
-#include "Classes/Components/AudioComponent.h"
+#include "Components/AudioComponent.h"
 #include "OVRLipSyncActorComponentBase.h"
 #include "OVRLipSyncFrame.h"
 
@@ -35,10 +35,10 @@ class OVRLIPSYNC_API UOVRLipSyncPlaybackActorComponent : public UOVRLipSyncActor
 	GENERATED_BODY()
 
 public:
-	UPROPERTY(EditAnywhere, Meta = (Tooltip = "LipSync Sequence to be played"))
+	UPROPERTY(EditAnywhere, Category = "LipSync", Meta = (Tooltip = "LipSync Sequence to be played"))
 	UOVRLipSyncFrameSequence *Sequence;
 
-	UPROPERTY(BlueprintReadonly)
+	UPROPERTY(BlueprintReadonly, Category = "LipSync")
 	UAudioComponent *AudioComponent;
 
 	UFUNCTION(BlueprintCallable, Category = "LipSync",

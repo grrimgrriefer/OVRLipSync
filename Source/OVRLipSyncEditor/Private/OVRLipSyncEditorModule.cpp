@@ -22,10 +22,9 @@
  ******************************************************************************/
 #include "ContentBrowserModule.h"
 
-#include "AssetRegistryModule.h"
+#include "AssetRegistry/AssetRegistryModule.h"
 #include "AudioDecompress.h"
 #include "AudioDevice.h"
-#include "Classes/Sound/SoundWave.h"
 #include "Engine.h"
 #include "Framework/Commands/UIAction.h"
 #include "Framework/MultiBox/MultiBoxBuilder.h"
@@ -34,11 +33,11 @@
 #include "Modules/ModuleManager.h"
 #include "OVRLipSyncContextWrapper.h"
 #include "OVRLipSyncFrame.h"
+#include "Sound/SoundWave.h"
 #include "Textures/SlateIcon.h"
 
 namespace
 {
-
 // Compute LipSync sequence frames at 100 times a second rate
 constexpr auto LipSyncSequenceUpateFrequency = 100;
 constexpr auto LipSyncSequenceDuration = 1.0f / LipSyncSequenceUpateFrequency;
@@ -75,7 +74,7 @@ bool DecompressSoundWave(USoundWave *SoundWave)
 
 bool OVRLipSyncProcessSoundWave(const FAssetData &SoundWaveAsset, bool UseOfflineModel = false)
 {
-	auto ObjectPath = SoundWaveAsset.ObjectPath.ToString();
+	auto ObjectPath = SoundWaveAsset.GetObjectPathString();
 	auto SoundWave = FindObject<USoundWave>(NULL, *ObjectPath);
 	if (!SoundWave)
 	{
@@ -87,11 +86,13 @@ bool OVRLipSyncProcessSoundWave(const FAssetData &SoundWaveAsset, bool UseOfflin
 		UE_LOG(LogTemp, Error, TEXT("Can't process %s: only mono and stereo streams are supported"), *ObjectPath);
 		return false;
 	}
+	SoundWave->LoadingBehavior = ESoundWaveLoadingBehavior::ForceInline;
+
 	DecompressSoundWave(SoundWave);
 
 	auto SequenceName = FString::Printf(TEXT("%s_LipSyncSequence"), *SoundWaveAsset.AssetName.ToString());
 	auto SequencePath = FString::Printf(TEXT("%s_LipSyncSequence"), *SoundWaveAsset.PackageName.ToString());
-	auto SequencePackage = CreatePackage(NULL, *SequencePath);
+	auto SequencePackage = CreatePackage(*SequencePath);
 	auto Sequence = NewObject<UOVRLipSyncFrameSequence>(SequencePackage, *SequenceName, RF_Public | RF_Standalone);
 
 	auto NumChannels = SoundWave->NumChannels;
@@ -194,7 +195,7 @@ TSharedRef<FExtender> OVRLipSyncContextMenuExtender(const TArray<FAssetData> &Se
 	TArray<FAssetData> SelectedSoundWaveAssets;
 	for (auto &Asset : SelectedAssets)
 	{
-		if (Asset.AssetClass.ToString().Contains(TEXT("SoundWave")))
+		if (Asset.AssetClassPath.ToString().Contains(TEXT("SoundWave")))
 		{
 			SelectedSoundWaveAssets.Add(Asset);
 		}
@@ -207,7 +208,6 @@ TSharedRef<FExtender> OVRLipSyncContextMenuExtender(const TArray<FAssetData> &Se
 	}
 	return Extender;
 }
-
 } // namespace
 
 class FOVRLipSyncEditorModule : public IModuleInterface

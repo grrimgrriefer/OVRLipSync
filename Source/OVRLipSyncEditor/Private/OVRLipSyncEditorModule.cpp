@@ -57,8 +57,8 @@ bool DecompressSoundWave(USoundWave *SoundWave)
 
 	AudioDevice->StopAllSounds(true);
 	auto OriginalDecompressionType = SoundWave->DecompressionType;
-	SoundWave->DecompressionType = DTYPE_Native;
-	if (SoundWave->InitAudioResource(AudioDevice->GetRuntimeFormat(SoundWave)))
+	SoundWave->DecompressionType = DTYPE_RealTime;
+	if (SoundWave->InitAudioResource(SoundWave->GetRuntimeFormat()))
 	{
 #if UE_VERSION_OLDER_THAN(4, 22, 0)
 		USoundWave::FAsyncAudioDecompress Decompress(SoundWave);
